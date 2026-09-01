@@ -14,7 +14,7 @@ type StoredMessage = {
 
 type AddMessageResult =
   | { message: Message; error?: never }
-  | { message?: never; error: "INVALID_MESSAGE" | "INVALID_CLIENT" | "RATE_LIMIT" };
+  | { message?: never; error: "INVALID_MESSAGE" | "INVALID_CLIENT" | "INVALID_ID" | "RATE_LIMIT" };
 
 const JSON_HEADERS = {
   "Cache-Control": "no-store",
@@ -54,37 +54,40 @@ export class MessageRoom extends DurableObject<Env> {
       .map((row) => ({ id: row.id, text: row.text, createdAt: row.created_at }));
   }
 
-  addMessage(text: string, clientId: string): AddMessageResult {
-    const normalizedText = text.trim();
+  addMessage(text: string, clientId: string, messageId: string, networkKey: string): AddMessageResult {
+    const normalizedText = text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
     if (!normalizedText || normalizedText.length > 500) return { error: "INVALID_MESSAGE" };
     if (!/^[a-zA-Z0-9-]{16,80}$/.test(clientId)) return { error: "INVALID_CLIENT" };
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(messageId)) return { error: "INVALID_ID" };
+
+    const existing = this.ctx.storage.sql
+      .exec<StoredMessage>("SELECT id, text, created_at FROM messages WHERE id = ?", messageId)
+      .toArray()[0];
+    if (existing) return { message: { id: existing.id, text: existing.text, createdAt: existing.created_at } };
 
     const now = Date.now();
     const windowStart = Math.floor(now / 60_000) * 60_000;
-    const rate = this.ctx.storage.sql
-      .exec<{ window_start: number; message_count: number }>(
-        "SELECT window_start, message_count FROM rate_limits WHERE client_id = ?",
-        clientId
-      )
-      .toArray()[0];
-
-    if (rate?.window_start === windowStart && rate.message_count >= 10) return { error: "RATE_LIMIT" };
-
-    this.ctx.storage.sql.exec(
-      `INSERT INTO rate_limits (client_id, window_start, message_count)
-       VALUES (?, ?, 1)
-       ON CONFLICT(client_id) DO UPDATE SET
-         window_start = excluded.window_start,
-         message_count = CASE
-           WHEN rate_limits.window_start = excluded.window_start THEN rate_limits.message_count + 1
-           ELSE 1
-         END`,
-      clientId,
-      windowStart
-    );
+    const rateKeys = [[`client:${clientId}`, 10] as const, [`network:${networkKey}`, 30] as const];
+    for (const [key, limit] of rateKeys) {
+      const rate = this.ctx.storage.sql
+        .exec<{ window_start: number; message_count: number }>("SELECT window_start, message_count FROM rate_limits WHERE client_id = ?", key)
+        .toArray()[0];
+      if (rate?.window_start === windowStart && rate.message_count >= limit) return { error: "RATE_LIMIT" };
+    }
+    for (const [key] of rateKeys) {
+      this.ctx.storage.sql.exec(
+        `INSERT INTO rate_limits (client_id, window_start, message_count)
+         VALUES (?, ?, 1)
+         ON CONFLICT(client_id) DO UPDATE SET
+           window_start = excluded.window_start,
+           message_count = CASE WHEN rate_limits.window_start = excluded.window_start THEN rate_limits.message_count + 1 ELSE 1 END`,
+        key,
+        windowStart
+      );
+    }
 
     const message: Message = {
-      id: crypto.randomUUID(),
+      id: messageId,
       text: normalizedText,
       createdAt: new Date(now).toISOString()
     };
@@ -95,7 +98,7 @@ export class MessageRoom extends DurableObject<Env> {
       message.createdAt
     );
     this.ctx.storage.sql.exec(
-      "DELETE FROM messages WHERE id NOT IN (SELECT id FROM messages ORDER BY created_at DESC LIMIT 200)"
+      "DELETE FROM messages WHERE id NOT IN (SELECT id FROM messages ORDER BY created_at DESC LIMIT 2000)"
     );
     return { message };
   }
@@ -111,6 +114,8 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   if (request.method === "GET") return json({ messages: await room.getMessages() });
 
   if (request.method === "POST") {
+    if (request.headers.get("Origin") !== url.origin) return json({ error: "拒絕跨網站寫入" }, 403);
+    if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) return json({ error: "只接受 JSON" }, 415);
     const contentLength = Number(request.headers.get("content-length") || 0);
     if (contentLength > 4096) return json({ error: "留言內容過長" }, 413);
 
@@ -122,11 +127,14 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
     }
     if (!body || typeof body !== "object") return json({ error: "留言格式錯誤" }, 400);
     const candidate = body as Record<string, unknown>;
-    if (typeof candidate.text !== "string" || typeof candidate.clientId !== "string") {
+    if (typeof candidate.text !== "string" || typeof candidate.clientId !== "string" || typeof candidate.messageId !== "string") {
       return json({ error: "留言格式錯誤" }, 400);
     }
 
-    const result = await room.addMessage(candidate.text, candidate.clientId);
+    const address = request.headers.get("CF-Connecting-IP") || "unknown";
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`civic-law-lab:${address}`));
+    const networkKey = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("").slice(0, 32);
+    const result = await room.addMessage(candidate.text, candidate.clientId, candidate.messageId, networkKey);
     if (result.error === "RATE_LIMIT") return json({ error: "送出太頻繁，請稍後再試" }, 429);
     if (result.error) return json({ error: "留言格式錯誤或超過 500 字" }, 400);
     return json({ message: result.message }, 201);
@@ -140,7 +148,16 @@ export default {
     const url = new URL(request.url);
     try {
       if (url.pathname.startsWith("/api/")) return await handleApi(request, env);
-      return await env.ASSETS.fetch(request);
+      const asset = await env.ASSETS.fetch(request);
+      const headers = new Headers(asset.headers);
+      headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
+      headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
+      headers.set("Referrer-Policy", "no-referrer");
+      headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+      headers.set("X-Content-Type-Options", "nosniff");
+      headers.set("X-Frame-Options", "DENY");
+      return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
     } catch (error) {
       console.error(JSON.stringify({
         message: "request failed",

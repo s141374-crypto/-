@@ -618,8 +618,8 @@
         <div class="notes-workbench">
           <section class="panel note-preview" id="notePreview" aria-live="polite"><p class="notes-helper">尚未生成預覽。選擇來源與章節後，按下「生成預覽」。</p></section>
           <section class="panel selector-panel">
-            <h2 class="serif">小隊對話框｜互動修正</h2>
-            <p class="notes-helper">可輸入補充、改寫或比較需求；留言會優先存入免費雲端資料庫，離線時則保存在這台裝置。</p>
+            <h2 class="serif">小隊共用留言｜互動修正</h2>
+            <p class="notes-helper">所有手機與電腦開啟公開網站後，都會看到相同留言，並約每 10 秒自動更新。留言屬公開共用內容，請勿填寫姓名、電話、帳號或其他個人資料。</p>
             <textarea class="notes-request" id="notesRequest" placeholder="例如：請把第三段的法律責任寫得更詳細；請加入最新修法重點；請比較請願與訴願"></textarea>
             <div class="note-actions"><button class="primary-btn" type="button" id="sendNotesMessage">送出修正指令</button></div>
             <div class="legal-note hidden" id="notesResponse"></div>
@@ -1076,6 +1076,7 @@
       document.querySelectorAll("[data-civic-tab]").forEach(button => button.classList.toggle("active", button.dataset.civicTab === tab));
       $("civicQuizView").classList.toggle("hidden", tab !== "quiz");
       $("civicNotesView").classList.toggle("hidden", tab !== "notes");
+      if (tab === "notes") syncSharedMessages();
     }
 
     function renderTopics() {
@@ -1224,12 +1225,13 @@
       const key = $("noteChapter").value; const source = $("noteSource").selectedOptions[0].textContent; const blueprint = NOTE_BLUEPRINTS[key] || NOTE_BLUEPRINTS["local-government"];
       const sections = blueprint.sections.map(section => `<h2>${section.h}</h2><ul>${section.bullets.map(item => `<li>${item}</li>`).join("")}</ul>`).join("");
       const compare = `<h2>容易混淆概念比較</h2><table class="compare-table"><thead><tr><th>概念</th><th>重點</th></tr></thead><tbody><tr><td>${blueprint.compare[0]}</td><td>${blueprint.compare[1]}</td></tr><tr><td>${blueprint.compare[2]}</td><td>${blueprint.compare[3]}</td></tr></tbody></table>`;
-      $("notePreview").innerHTML = `<span class="note-source">參考來源：${source}</span><h1>${blueprint.title}</h1><p>${blueprint.intro}</p>${sections}${compare}${message ? `<div class="legal-note"><strong>小隊修正紀錄</strong><br>${message}</div>` : ""}`;
+      $("notePreview").innerHTML = `<span class="note-source">參考來源：${source}</span><h1>${blueprint.title}</h1><p>${blueprint.intro}</p>${sections}${compare}${message ? `<div class="legal-note"><strong>小隊修正紀錄</strong><br>${escapeHtml(message)}</div>` : ""}`;
     }
     function generateNotesPreview() { renderNotePreview(); $("notesResponse").textContent = "已生成結構化預覽，請先檢查來源與章節考據，再使用下方對話框微調。"; $("notesResponse").classList.remove("hidden"); }
     const NOTE_DB_NAME = "civic-learning-notes";
     const NOTE_STORE_NAME = "messages";
     const NOTE_API_PATH = "/api/messages";
+    let noteSyncInFlight = false;
 
     function getNoteClientId() {
       try {
@@ -1274,7 +1276,7 @@
       const chat = document.createElement("div");
       chat.className = "team-chat-item";
       const title = document.createElement("strong");
-      title.textContent = "我的指令";
+      title.textContent = message.pending ? "離線待同步" : "所有裝置共用留言";
       const time = document.createElement("small");
       time.textContent = ` · ${new Date(message.createdAt).toLocaleString("zh-TW")}`;
       const content = document.createElement("div");
@@ -1304,15 +1306,40 @@
       }
     }
 
+    async function syncPendingMessages() {
+      let pending = [];
+      try {
+        pending = (await withNoteStore("readonly", store => store.getAll())).filter(message => message.pending && message.id);
+      } catch { return; }
+      for (const message of pending) {
+        try {
+          const response = await fetch(NOTE_API_PATH, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ text: message.text, clientId: getNoteClientId(), messageId: message.id })
+          });
+          if (!response.ok) break;
+          await withNoteStore("readwrite", store => store.delete(message.id));
+        } catch { break; }
+      }
+    }
+
+    async function syncSharedMessages() {
+      if (noteSyncInFlight) return;
+      noteSyncInFlight = true;
+      try { await syncPendingMessages(); await loadNoteMessages(); }
+      finally { noteSyncInFlight = false; }
+    }
+
     async function sendNotesMessage() {
       const request = $("notesRequest").value.trim();
       if (!request) { $("notesResponse").textContent = "請先輸入要修改或補充的內容。"; $("notesResponse").classList.remove("hidden"); return; }
-      let message = { text: request, createdAt: new Date().toISOString() };
+      let message = { id: crypto.randomUUID(), text: request, createdAt: new Date().toISOString(), pending: true };
       try {
         const response = await fetch(NOTE_API_PATH, {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ text: request, clientId: getNoteClientId() })
+          body: JSON.stringify({ text: request, clientId: getNoteClientId(), messageId: message.id })
         });
         const payload = await response.json().catch(() => ({}));
         if (response.status >= 400 && response.status < 500) {
@@ -1326,9 +1353,9 @@
         renderNotePreview(request); $("notesResponse").textContent = `留言已存入免費雲端資料庫，並套用修正指令：「${request}」。`; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
       } catch (error) {
         try {
-          message.id = await withNoteStore("readwrite", store => store.add(message));
+          await withNoteStore("readwrite", store => store.put(message));
           prependNoteMessage(message);
-          renderNotePreview(request); $("notesResponse").textContent = "目前離線，留言已保存在這台裝置，恢復連線後仍可查看。"; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
+          renderNotePreview(request); $("notesResponse").textContent = "目前離線，留言已暫存在這台裝置；恢復連線後會自動上傳，讓所有裝置看到。"; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
         } catch (localError) {
           $("notesResponse").textContent = `留言儲存失敗：${localError.message}`; $("notesResponse").classList.remove("hidden");
         }
@@ -1546,6 +1573,10 @@
     renderQuiz();
     renderDaily();
     loadNoteMessages();
+    window.addEventListener("online", syncSharedMessages);
+    window.setInterval(() => {
+      if ($("civicsScreen").classList.contains("active") && !$("civicNotesView").classList.contains("hidden")) syncSharedMessages();
+    }, 10_000);
   </script>
 </body>
 </html>

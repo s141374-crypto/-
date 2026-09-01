@@ -5,6 +5,10 @@ await copyFile(
   new URL("../index.html", import.meta.url),
   new URL("../public/index.html", import.meta.url)
 );
+await copyFile(
+  new URL("../_headers", import.meta.url),
+  new URL("../public/_headers", import.meta.url)
+);
 await cp(
   new URL("../law-data/", import.meta.url),
   new URL("../public/law-data/", import.meta.url),

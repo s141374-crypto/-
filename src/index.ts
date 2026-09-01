@@ -22,8 +22,25 @@ const JSON_HEADERS = {
   "X-Content-Type-Options": "nosniff"
 };
 
-function json(data: unknown, status = 200): Response {
-  return Response.json(data, { status, headers: JSON_HEADERS });
+const TRUSTED_WEB_ORIGINS = new Set([
+  "https://civic-law-lab-212.yichengc869.workers.dev",
+  "https://s141374-crypto.github.io"
+]);
+
+function responseHeaders(origin?: string): Headers {
+  const headers = new Headers(JSON_HEADERS);
+  if (origin) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Access-Control-Max-Age", "86400");
+    headers.set("Vary", "Origin");
+  }
+  return headers;
+}
+
+function json(data: unknown, status = 200, origin?: string): Response {
+  return Response.json(data, { status, headers: responseHeaders(origin) });
 }
 
 export class MessageRoom extends DurableObject<Env> {
@@ -106,41 +123,51 @@ export class MessageRoom extends DurableObject<Env> {
 
 async function handleApi(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  if (url.pathname !== "/api/messages") return json({ error: "找不到 API" }, 404);
+  const requestOrigin = request.headers.get("Origin") || "";
+  const trustedOrigin = TRUSTED_WEB_ORIGINS.has(requestOrigin) ? requestOrigin : undefined;
+  const respond = (data: unknown, status = 200) => json(data, status, trustedOrigin);
+  if (url.pathname !== "/api/messages") return respond({ error: "找不到 API" }, 404);
+
+  if (request.method === "OPTIONS") {
+    if (!trustedOrigin) return respond({ error: "拒絕未授權網站" }, 403);
+    return new Response(null, { status: 204, headers: responseHeaders(trustedOrigin) });
+  }
 
   // Wrangler currently generates this namespace without its RPC generic; retain the
   // generated Env and narrow only this stub to the exported Durable Object class.
   const room = env.MESSAGE_ROOM.getByName("civic-notes-main") as DurableObjectStub<MessageRoom>;
-  if (request.method === "GET") return json({ messages: await room.getMessages() });
+  if (request.method === "GET") return respond({ messages: await room.getMessages() });
 
   if (request.method === "POST") {
-    if (request.headers.get("Origin") !== url.origin) return json({ error: "拒絕跨網站寫入" }, 403);
-    if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) return json({ error: "只接受 JSON" }, 415);
+    if (!trustedOrigin) return respond({ error: "拒絕未授權網站寫入" }, 403);
+    if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) return respond({ error: "只接受 JSON" }, 415);
     const contentLength = Number(request.headers.get("content-length") || 0);
-    if (contentLength > 4096) return json({ error: "留言內容過長" }, 413);
+    if (contentLength > 4096) return respond({ error: "留言內容過長" }, 413);
 
     let body: unknown;
     try {
       body = await request.json();
     } catch {
-      return json({ error: "請提供有效的 JSON" }, 400);
+      return respond({ error: "請提供有效的 JSON" }, 400);
     }
-    if (!body || typeof body !== "object") return json({ error: "留言格式錯誤" }, 400);
+    if (!body || typeof body !== "object") return respond({ error: "留言格式錯誤" }, 400);
     const candidate = body as Record<string, unknown>;
     if (typeof candidate.text !== "string" || typeof candidate.clientId !== "string" || typeof candidate.messageId !== "string") {
-      return json({ error: "留言格式錯誤" }, 400);
+      return respond({ error: "留言格式錯誤" }, 400);
     }
 
     const address = request.headers.get("CF-Connecting-IP") || "unknown";
     const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`civic-law-lab:${address}`));
     const networkKey = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("").slice(0, 32);
     const result = await room.addMessage(candidate.text, candidate.clientId, candidate.messageId, networkKey);
-    if (result.error === "RATE_LIMIT") return json({ error: "送出太頻繁，請稍後再試" }, 429);
-    if (result.error) return json({ error: "留言格式錯誤或超過 500 字" }, 400);
-    return json({ message: result.message }, 201);
+    if (result.error === "RATE_LIMIT") return respond({ error: "送出太頻繁，請稍後再試" }, 429);
+    if (result.error) return respond({ error: "留言格式錯誤或超過 500 字" }, 400);
+    return respond({ message: result.message }, 201);
   }
 
-  return new Response(null, { status: 405, headers: { Allow: "GET, POST" } });
+  const headers = responseHeaders(trustedOrigin);
+  headers.set("Allow", "GET, POST, OPTIONS");
+  return new Response(null, { status: 405, headers });
 }
 
 export default {

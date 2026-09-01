@@ -1230,7 +1230,7 @@
     function generateNotesPreview() { renderNotePreview(); $("notesResponse").textContent = "已生成結構化預覽，請先檢查來源與章節考據，再使用下方對話框微調。"; $("notesResponse").classList.remove("hidden"); }
     const NOTE_DB_NAME = "civic-learning-notes";
     const NOTE_STORE_NAME = "messages";
-    const NOTE_API_PATH = "/api/messages";
+    const NOTE_API_PATH = "https://civic-law-lab-212.yichengc869.workers.dev/api/messages";
     let noteSyncInFlight = false;
 
     function getNoteClientId() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#123f49">
+  <meta name="theme-color" content="#ffffff">
   <title>公民法律研究室｜互動學習遊戲</title>
   <style>
     :root {
@@ -355,6 +355,85 @@
     .toast { position: fixed; left: 50%; bottom: 28px; z-index: 100; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; padding: 12px 17px; border-radius: 999px; background: var(--near-black); color: var(--white); box-shadow: var(--shadow); transition: .25s ease; }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    /* Restrained editorial system: neutral surfaces, square geometry, minimal effects. */
+    :root {
+      --sage: #d4d4d4;
+      --mist: #a3a3a3;
+      --straw: #737373;
+      --olive: #525252;
+      --blue: #404040;
+      --forest: #333333;
+      --slate: #737373;
+      --deep-teal: #262626;
+      --ink-blue: #171717;
+      --near-black: #0a0a0a;
+      --paper: #f5f5f5;
+      --paper-2: #eeeeee;
+      --white: #ffffff;
+      --ink: #171717;
+      --muted: #666666;
+      --line: #d4d4d4;
+      --danger: #7f1d1d;
+      --radius: 6px;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    }
+    body { background: #f5f5f5; }
+    body::before, .hero::after, .mode-card::after, .note-card::after { display: none; }
+    button:focus-visible { outline: 2px solid #404040; outline-offset: 2px; }
+    .topbar { border-bottom-color: #dedede; background: rgba(255,255,255,.96); color: var(--ink); backdrop-filter: blur(10px); }
+    .top-actions { position: static; margin-left: auto; }
+    .brand-mark { border-color: #bdbdbd; border-radius: 4px; background: #262626; color: #fff; transform: none; }
+    .brand small { color: #737373; }
+    .top-button { border-color: #cfcfcf; border-radius: 4px; color: var(--ink); }
+    .top-button:hover { background: #f0f0f0; }
+    .kicker { padding: 0; border-radius: 0; background: transparent; color: #525252; }
+    .kicker::before { width: 18px; height: 1px; border-radius: 0; background: #737373; }
+    .hero { min-height: 280px; border-color: #d4d4d4; border-radius: 6px; background: #fff; box-shadow: none; }
+    .hero h1 span { color: #525252; }
+    .selection-label { color: #525252; }
+    .mode-card { min-height: 240px; border-color: #d4d4d4; border-radius: 6px; color: var(--ink); box-shadow: none; transition: border-color .18s ease, background .18s ease; }
+    .mode-card:hover { transform: none; border-color: #737373; box-shadow: none; background: #f7f7f7; }
+    .mode-card:nth-child(1), .mode-card:nth-child(2), .mode-card:nth-child(3) { background: #fff; }
+    .mode-no, .mode-card p { color: #666; }
+    .mode-enter { color: #262626; }
+    .panel { border-color: #d4d4d4; background: #fff; box-shadow: none; }
+    .case-card::before { height: 2px; background: #404040 !important; }
+    .tag, .note-source { border-radius: 3px; background: #eeeeee; color: #404040; }
+    .primary-btn, .soft-btn, .danger-btn { border: 1px solid #cfcfcf; border-radius: 4px; transition: background .15s ease, border-color .15s ease; }
+    .primary-btn:hover, .soft-btn:hover, .danger-btn:hover { transform: none; }
+    .primary-btn { border-color: #262626; background: #262626; }
+    .soft-btn { background: #fff; }
+    .court-panel, .daily-aside { background: #262626; }
+    .court-scene { background: #202020; }
+    .court-scene::before { display: none; }
+    .avatar { border-radius: 4px; background: #3f3f3f; color: #fff; box-shadow: none; }
+    .testimony { border-radius: 4px; }
+    .option-btn, .feedback, .selector-field select, .notes-request, .legal-note, .knowledge-box, .evidence-item { border-radius: 4px; }
+    .option-btn:hover { border-color: #737373; background: #f5f5f5; }
+    .option-btn.correct, .evidence-item.collected { border-color: #525252; background: #e7e7e7; }
+    .option-btn.wrong { border-color: #7f1d1d; background: #f5eaea; }
+    .feedback, .legal-note, .knowledge-box { background: #eeeeee; color: #404040; }
+    .source-link { display: inline-block; margin-top: 8px; color: #333; font-size: 12px; text-underline-offset: 3px; }
+    .law-bank-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+    .law-bank-btn { padding: 9px 13px; border: 1px solid #cfcfcf; border-radius: 4px; background: #fff; color: #333; font: inherit; cursor: pointer; }
+    .law-bank-btn.active { border-color: #262626; background: #262626; color: #fff; }
+    .law-bank-status { margin-left: auto; color: #666; font-size: 12px; }
+    .law-question-meta { margin: -4px 0 16px; color: #666; font-size: 12px; line-height: 1.6; }
+    .log-item, .team-chat-item { border-left-color: #737373; background: #f3f3f3; }
+    .tabs { padding: 0; border-bottom: 1px solid #d4d4d4; border-radius: 0; background: transparent; }
+    .tab-btn { border-radius: 0; }
+    .tab-btn.active { border-bottom: 2px solid #262626; background: transparent; color: #171717; box-shadow: none; }
+    .topic-chip { border: 1px solid #dedede; border-radius: 4px; background: #f7f7f7; }
+    .topic-chip.active { border-color: #404040; background: #404040; }
+    .progress-line { height: 4px; border-radius: 0; }
+    .progress-line div { background: #404040; }
+    .daily-aside .big { color: #fff; }
+    .modal { background: rgba(0,0,0,.62); backdrop-filter: none; }
+    .modal-box { border-radius: 6px; background: #fff; box-shadow: 0 16px 48px rgba(0,0,0,.2); }
+    .modal-head { background: #fff; }
+    .close-btn { border-radius: 4px; }
+    .toast { border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+
     @media (max-width: 900px) {
       .mode-grid, .case-grid { grid-template-columns: 1fr; }
       .mode-card { min-height: 235px; }
@@ -540,9 +619,9 @@
           <section class="panel note-preview" id="notePreview" aria-live="polite"><p class="notes-helper">尚未生成預覽。選擇來源與章節後，按下「生成預覽」。</p></section>
           <section class="panel selector-panel">
             <h2 class="serif">小隊對話框｜互動修正</h2>
-            <p class="notes-helper">可輸入補充、改寫、比較或最新修法需求；送出後會更新上方預覽，留言也會保存在這台裝置的瀏覽器資料庫。</p>
+            <p class="notes-helper">可輸入補充、改寫或比較需求；留言會優先存入免費雲端資料庫，離線時則保存在這台裝置。</p>
             <textarea class="notes-request" id="notesRequest" placeholder="例如：請把第三段的法律責任寫得更詳細；請加入最新修法重點；請比較請願與訴願"></textarea>
-            <div class="note-actions"><button class="primary-btn" type="button" id="sendNotesMessage">送出修正指令</button><button class="soft-btn" type="button" id="clearNotesHistory">清除留言紀錄</button></div>
+            <div class="note-actions"><button class="primary-btn" type="button" id="sendNotesMessage">送出修正指令</button></div>
             <div class="legal-note hidden" id="notesResponse"></div>
             <div class="team-chat-log" id="noteChatLog" aria-live="polite"></div>
           </section>
@@ -554,9 +633,14 @@
       <button class="back-link" type="button" data-home>← 回到三種模式</button>
       <div class="screen-head">
         <div><div class="kicker">03 / DAILY 法律小常識</div><h1 class="serif">先猜，再看法律怎麼說</h1></div>
-        <p>題目以臺灣常見生活情境為例，答案用一般原則說明；真實案件仍須依具體事實判斷。</p>
+        <p>可從完整公開法規條文隨機抽題，也可切換生活情境題；每題都附上全國法規資料庫來源。</p>
       </div>
-      <div class="tabs" id="dailyTopicList" aria-label="法律問答小主題"></div>
+      <div class="law-bank-switch" aria-label="選擇法律題庫">
+        <button class="law-bank-btn active" type="button" data-daily-bank="official">完整公開法規題庫</button>
+        <button class="law-bank-btn" type="button" data-daily-bank="curated">生活情境題</button>
+        <span class="law-bank-status" id="lawBankStatus">正在讀取法務部公開法規資料…</span>
+      </div>
+      <div class="tabs hidden" id="dailyTopicList" aria-label="法律問答小主題"></div>
       <div class="daily-layout">
         <section class="panel daily-card" id="dailyCard"></section>
         <aside class="panel daily-aside"><div class="kicker" style="color:#fff;background:rgba(255,255,255,.1)">今日連勝</div><div class="big" id="dailyStreak">0</div><p>不只背答案，也要知道「為什麼」。連續答對，就能累積法律直覺。</p><div class="legal-note" style="background:rgba(255,255,255,.1);color:#fff">學習提醒：本區是一般法律教育內容，不取代律師針對個案提供的法律意見。</div></aside>
@@ -751,16 +835,27 @@
     };
 
     const DAILY = [
-      { q: "撿到別人的手機，只要沒有拿去賣，就可以先放在自己家嗎？", options: ["可以，撿到就暫時屬於自己", "不宜，應通知失主或送交警察等適當處理", "只要關機就沒關係"], answer: 1, fact: "拾得遺失物後，應通知所有人或報告警察等適當處理。把物品當成自己的，可能衍生民、刑事責任。" },
-      { q: "網路留言沒有指名道姓，就一定不會有法律問題嗎？", options: ["一定沒問題", "仍可能因上下文足以辨識特定人而有爭議", "只要用匿名帳號就沒問題"], answer: 1, fact: "是否能辨識特定人，不只看有沒有寫姓名，也可能綜合帳號、照片、職業與上下文判斷。" },
-      { q: "朋友傳來電影下載檔，說『沒有收錢就不算侵權』，這句話正確嗎？", options: ["正確，免費就沒事", "不一定，未經授權重製或散布仍可能侵權", "只要刪除檔名就合法"], answer: 1, fact: "是否營利可能影響責任判斷，但不是唯一標準。未經授權重製、公開傳輸或散布，仍可能侵害著作權。" },
-      { q: "餐廳標示『遺失物概不負責』，物品不見時餐廳就一定完全免責嗎？", options: ["一定免責", "不一定，仍要看餐廳是否有過失及具體保管關係", "只要有貼告示就等於法律"], answer: 1, fact: "店家能否免責要看契約關係、注意義務與實際過失等因素，單一告示不必然排除所有責任。" },
-      { q: "在群組轉傳他人的身分證照片，只要是為了提醒大家就一定合法嗎？", options: ["一定合法", "仍應考量個資與隱私，避免超出必要範圍", "群組內沒有法律"], answer: 1, fact: "身分證資料高度敏感。即使出於提醒目的，也應評估是否有必要、是否能遮蔽資料，以及傳播範圍。" },
-      { q: "商店寫著『商品售出概不退換』，消費者就完全沒有任何權利嗎？", options: ["是，店家寫了就算", "不一定，仍要看購買方式、商品瑕疵及法定權利", "只有現金購買才能退"], answer: 1, fact: "實體店面一般沒有任意七日猶豫期，但若商品有瑕疵仍可能主張權利；通訊交易則另有消保法規範與例外。" }
+      { topic: "生活安全", q: "撿到別人的手機，只要沒有拿去賣，就可以先放在自己家嗎？", options: ["可以，撿到就暫時屬於自己", "不宜，應通知失主或送交警察等適當處理", "只要關機就沒關係"], answer: 1, fact: "拾得遺失物後，應從速通知有受領權的人，或報告警察、自治機關並交存拾得物。", source: ["民法第 803 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=B0000001&flno=803"] },
+      { topic: "網路法律", q: "網路留言沒有指名道姓，就一定不會有法律問題嗎？", options: ["一定沒問題", "仍可能因上下文足以辨識特定人而有爭議", "只要用匿名帳號就沒問題"], answer: 1, fact: "是否涉及特定人的名譽、隱私或個資，要看整體內容與具體情境，並非只看有沒有寫姓名。", source: ["個人資料保護法", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050021"] },
+      { topic: "網路法律", q: "朋友傳來電影下載檔，說『沒有收錢就不算侵權』，這句話正確嗎？", options: ["正確，免費就沒事", "不一定，未經授權重製或散布仍可能侵權", "只要刪除檔名就合法"], answer: 1, fact: "是否營利不是唯一標準；未經授權重製、公開傳輸或散布，仍可能侵害著作財產權。", source: ["著作權法", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0070017"] },
+      { topic: "消費權益", q: "餐廳標示『遺失物概不負責』，物品不見時餐廳就一定完全免責嗎？", options: ["一定免責", "不一定，仍要看餐廳是否有過失及具體保管關係", "只要有貼告示就等於法律"], answer: 1, fact: "店家能否免責仍要依契約、注意義務與具體過失判斷，單一告示不當然排除全部責任。", source: ["消費者保護法", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0170001"] },
+      { topic: "個資與隱私", q: "在群組轉傳他人的身分證照片，只要是為了提醒大家就一定合法嗎？", options: ["一定合法", "仍應考量個資與隱私，避免超出必要範圍", "群組內沒有法律"], answer: 1, fact: "身分證資料可識別個人。蒐集、處理與利用個資應有特定目的及法定依據，並避免超出必要範圍。", source: ["個人資料保護法第 5、19、20 條", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=I0050021"] },
+      { topic: "消費權益", q: "商店寫著『商品售出概不退換』，消費者就完全沒有任何權利嗎？", options: ["是，店家寫了就算", "不一定，仍要看購買方式、商品瑕疵及法定權利", "只有現金購買才能退"], answer: 1, fact: "實體店面通常沒有任意七日解除權，但商品瑕疵仍可能產生權利；通訊交易另受消保法規範並有合理例外。", source: ["消費者保護法第 19 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=J0170001&flno=19"] },
+      { topic: "消費權益", q: "網購商品一律都能在七日內無條件退貨嗎？", options: ["一律可以", "不一定，法律另允許合理例外", "只有信用卡付款可以"], answer: 1, fact: "通訊交易原則上有七日解除權，但法律授權對易腐敗、客製化等合理情形另定例外。", source: ["消費者保護法第 19 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=J0170001&flno=19"] },
+      { topic: "消費權益", q: "網路商店只寫商品價格，不提供聯絡方式與退貨資訊，這樣就足夠嗎？", options: ["足夠，價格最重要", "不足，通訊交易依法應揭露特定資訊", "只有大型平台需要揭露"], answer: 1, fact: "通訊交易業者應以清楚易懂方式提供聯絡資料、商品或服務內容、付款交付方式及解除契約資訊等。", source: ["消費者保護法第 18 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=J0170001&flno=18"] },
+      { topic: "個資與隱私", q: "當事人可以向持有自己個資的機構請求查詢或複製嗎？", options: ["原則上可以依法行使", "一律不可以", "只有離職後才可以"], answer: 0, fact: "個資法列有查詢、閱覽、製給複製本、補充更正、停止利用及刪除等權利，但仍有法定限制。", source: ["個人資料保護法第 3 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=I0050021&flno=3"] },
+      { topic: "個資與隱私", q: "公司合法蒐集到客戶電話後，就能拿去做任何其他用途嗎？", options: ["可以，資料已經取得", "原則上仍應在特定目的必要範圍內利用", "只要沒有公開就可以"], answer: 1, fact: "非公務機關利用個資原則上應在蒐集的特定目的必要範圍內；目的外利用須符合例外要件。", source: ["個人資料保護法第 20 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=I0050021&flno=20"] },
+      { topic: "網路法律", q: "網路上公開看得到的圖片，就能任意下載後重新上傳嗎？", options: ["可以，公開等於放棄著作權", "不一定，公開可見不等於已授權重製或公開傳輸", "加上來源就一定可以"], answer: 1, fact: "著作公開可見不代表權利人放棄著作財產權；利用時仍要確認授權或是否符合合理使用等規定。", source: ["著作權法", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0070017"] },
+      { topic: "網路法律", q: "只要標註作者姓名，使用他人著作就一定屬於合理使用嗎？", options: ["一定是", "不一定，仍要綜合目的、性質、比例與市場影響判斷", "只有學生才適用"], answer: 1, fact: "標示出處是重要要求之一，但合理使用仍須依利用目的、著作性質、使用比例及市場影響等因素判斷。", source: ["著作權法第 65 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=J0070017&flno=65"] },
+      { topic: "生活安全", q: "在學校或車站撿到物品，可以交給該場所管理人員嗎？", options: ["可以，並由場所管理方進行招領", "不可以，只能自己保管", "必須直接丟棄"], answer: 0, fact: "在機關、學校、團體或其他公共場所拾得物品，可報告該場所管理單位或負責人並交存。", source: ["民法第 803 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=B0000001&flno=803"] },
+      { topic: "生活安全", q: "未成年人購買日常生活所必需的小額用品，契約一定無效嗎？", options: ["一定無效", "不一定，依年齡、法定代理人允許與日常生活情形判斷", "只要現金付款就無效"], answer: 1, fact: "限制行為能力人的法律行為原則上須法定代理人允許，但純獲法律上利益或依年齡身分、日常生活所必需者有例外。", source: ["民法第 77 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=B0000001&flno=77"] },
+      { topic: "消費權益", q: "商品可能危害消費者安全時，業者只要事後退款就完全沒有其他責任嗎？", options: ["是", "不一定，業者對商品或服務安全負有法定責任", "只有進口商有責任"], answer: 1, fact: "企業經營者提供商品或服務時，應符合當時科技或專業水準可合理期待的安全性。", source: ["消費者保護法第 7 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=J0170001&flno=7"] },
+      { topic: "生活安全", q: "住宅租賃押金可以由房東任意約定成十個月租金嗎？", options: ["可以，自由約定沒有上限", "不可以，土地法對房屋租賃擔保金額設有限制", "只有學生租屋有限制"], answer: 1, fact: "土地法規定房屋租賃的擔保金額不得超過二個月房屋租金總額，超過部分承租人得抵付房租。", source: ["土地法第 99 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=D0060001&flno=99"] },
+      { topic: "生活安全", q: "雇主可以不提供工資各項計算明細，只告知最後總額嗎？", options: ["可以", "原則上不可以，給付工資時應提供計算明細", "只有月薪超過一定金額才需要"], answer: 1, fact: "雇主給付工資時，應提供工資各項目計算方式明細，並依法置備與保存工資清冊。", source: ["勞動基準法第 23 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=N0030001&flno=23"] },
+      { topic: "網路法律", q: "憲法保障言論自由，是否代表任何網路發言都不受法律限制？", options: ["是，完全不受限制", "不是，權利保障仍須與他人權利及合法限制一起判斷", "只有實名發言受限制"], answer: 1, fact: "憲法保障言論自由，但具體發言仍可能涉及他人名譽、隱私或其他法律責任，須依個案事實判斷。", source: ["中華民國憲法第 11、23 條", "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001"] }
     ];
 
     const DAILY_TOPICS = ["all", "個資與隱私", "消費權益", "網路法律", "生活安全"];
-    DAILY.forEach((item, index) => { item.topic = DAILY_TOPICS[index % (DAILY_TOPICS.length - 1) + 1]; });
     const $ = id => document.getElementById(id);
     const courtState = { caseIndex: 0, hearts: 3, statement: 0, collected: new Set(), logicPassed: false, finished: false };
     const civicState = { topic: "全部", questions: [], index: 0, score: 0, answered: false };
@@ -1134,6 +1229,20 @@
     function generateNotesPreview() { renderNotePreview(); $("notesResponse").textContent = "已生成結構化預覽，請先檢查來源與章節考據，再使用下方對話框微調。"; $("notesResponse").classList.remove("hidden"); }
     const NOTE_DB_NAME = "civic-learning-notes";
     const NOTE_STORE_NAME = "messages";
+    const NOTE_API_PATH = "/api/messages";
+
+    function getNoteClientId() {
+      try {
+        let clientId = localStorage.getItem("civic-note-client-id");
+        if (!clientId) {
+          clientId = crypto.randomUUID();
+          localStorage.setItem("civic-note-client-id", clientId);
+        }
+        return clientId;
+      } catch {
+        return crypto.randomUUID();
+      }
+    }
 
     function openNoteDatabase() {
       return new Promise((resolve, reject) => {
@@ -1177,57 +1286,205 @@
 
     async function loadNoteMessages() {
       try {
-        const messages = await withNoteStore("readonly", store => store.getAll());
+        const response = await fetch(NOTE_API_PATH, { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error("雲端服務暫時無法使用");
+        const payload = await response.json();
+        const messages = Array.isArray(payload.messages) ? payload.messages : [];
         $("noteChatLog").innerHTML = "";
         messages.forEach(prependNoteMessage);
-      } catch (error) {
-        $("notesResponse").textContent = `無法讀取留言紀錄：${error.message}`;
-        $("notesResponse").classList.remove("hidden");
+      } catch {
+        try {
+          const messages = await withNoteStore("readonly", store => store.getAll());
+          $("noteChatLog").innerHTML = "";
+          messages.forEach(prependNoteMessage);
+        } catch (error) {
+          $("notesResponse").textContent = `無法讀取留言紀錄：${error.message}`;
+          $("notesResponse").classList.remove("hidden");
+        }
       }
     }
 
     async function sendNotesMessage() {
       const request = $("notesRequest").value.trim();
       if (!request) { $("notesResponse").textContent = "請先輸入要修改或補充的內容。"; $("notesResponse").classList.remove("hidden"); return; }
-      const message = { text: request, createdAt: new Date().toISOString() };
+      let message = { text: request, createdAt: new Date().toISOString() };
       try {
-        message.id = await withNoteStore("readwrite", store => store.add(message));
+        const response = await fetch(NOTE_API_PATH, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ text: request, clientId: getNoteClientId() })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (response.status >= 400 && response.status < 500) {
+          $("notesResponse").textContent = payload.error || "留言內容無法送出";
+          $("notesResponse").classList.remove("hidden");
+          return;
+        }
+        if (!response.ok) throw new Error(payload.error || "雲端留言服務暫時無法使用");
+        message = payload.message;
         prependNoteMessage(message);
-        renderNotePreview(request); $("notesResponse").textContent = `留言已存入瀏覽器資料庫，並套用修正指令：「${request}」。`; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
+        renderNotePreview(request); $("notesResponse").textContent = `留言已存入免費雲端資料庫，並套用修正指令：「${request}」。`; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
       } catch (error) {
-        $("notesResponse").textContent = `留言儲存失敗：${error.message}`; $("notesResponse").classList.remove("hidden");
-      }
-    }
-
-    async function clearNoteMessages() {
-      if (!window.confirm("確定要清除這台裝置上的全部留言紀錄嗎？")) return;
-      try {
-        await withNoteStore("readwrite", store => store.clear());
-        $("noteChatLog").innerHTML = "";
-        $("notesResponse").textContent = "留言紀錄已清除。"; $("notesResponse").classList.remove("hidden");
-      } catch (error) {
-        $("notesResponse").textContent = `無法清除留言紀錄：${error.message}`; $("notesResponse").classList.remove("hidden");
+        try {
+          message.id = await withNoteStore("readwrite", store => store.add(message));
+          prependNoteMessage(message);
+          renderNotePreview(request); $("notesResponse").textContent = "目前離線，留言已保存在這台裝置，恢復連線後仍可查看。"; $("notesResponse").classList.remove("hidden"); $("notesRequest").value = "";
+        } catch (localError) {
+          $("notesResponse").textContent = `留言儲存失敗：${localError.message}`; $("notesResponse").classList.remove("hidden");
+        }
       }
     }
 
     dailyState.solved = new Set();
+    dailyState.bank = "official";
     dailyState.topic = "all";
     dailyState.queue = [];
     dailyState.queueTopic = null;
-    function renderDailyTopics() { $("dailyTopicList").innerHTML = DAILY_TOPICS.map(topic => `<button class="tab-btn ${dailyState.topic === topic ? "active" : ""}" type="button" data-daily-topic="${topic}">${topic === "all" ? "全部小主題" : topic}</button>`).join(""); }
-    function renderDaily() {
+    dailyState.manifest = null;
+    dailyState.shardCache = new Map();
+    dailyState.usedByShard = new Map();
+    dailyState.renderToken = 0;
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+    }
+
+    function shortenLawText(value, max = 190) {
+      const clean = String(value || "").replace(/\s+/g, " ").trim();
+      return clean.length > max ? `${clean.slice(0, max)}…` : clean;
+    }
+
+    function renderDailyTopics() {
+      const topicList = $("dailyTopicList");
+      topicList.classList.toggle("hidden", dailyState.bank !== "curated");
+      topicList.innerHTML = DAILY_TOPICS.map(topic => `<button class="tab-btn ${dailyState.topic === topic ? "active" : ""}" type="button" data-daily-topic="${escapeHtml(topic)}">${topic === "all" ? "全部小主題" : escapeHtml(topic)}</button>`).join("");
+      document.querySelectorAll("[data-daily-bank]").forEach(button => button.classList.toggle("active", button.dataset.dailyBank === dailyState.bank));
+    }
+
+    async function loadLawManifest() {
+      if (dailyState.manifest) return dailyState.manifest;
+      const response = await fetch("/law-data/manifest.json", { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error("完整法規索引載入失敗");
+      dailyState.manifest = await response.json();
+      return dailyState.manifest;
+    }
+
+    function chooseWeightedShard(shards) {
+      const weighted = shards.map(shard => {
+        const used = dailyState.usedByShard.get(shard.file)?.size || 0;
+        return { shard, remaining: Math.max(0, shard.currentArticles - used) };
+      }).filter(item => item.remaining > 0);
+      const total = weighted.reduce((sum, item) => sum + item.remaining, 0);
+      if (!total) return null;
+      let roll = randomIndex(total);
+      for (const item of weighted) {
+        if (roll < item.remaining) return item.shard;
+        roll -= item.remaining;
+      }
+      return weighted[weighted.length - 1].shard;
+    }
+
+    async function loadLawShard(file) {
+      if (dailyState.shardCache.has(file)) {
+        const cached = dailyState.shardCache.get(file);
+        dailyState.shardCache.delete(file);
+        dailyState.shardCache.set(file, cached);
+        return cached;
+      }
+      const response = await fetch(`/law-data/${encodeURIComponent(file)}`, { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error(`法規資料 ${file} 載入失敗`);
+      const laws = await response.json();
+      const entries = [];
+      laws.filter(law => !law.d).forEach(law => law.a.forEach(article => {
+        if (article[1] && article[1].trim()) entries.push({ id: `${law.u}|${article[0]}`, lawName: law.n, url: law.u, articleNo: article[0], text: article[1], level: law.l, category: law.c });
+      }));
+      dailyState.shardCache.set(file, entries);
+      while (dailyState.shardCache.size > 4) dailyState.shardCache.delete(dailyState.shardCache.keys().next().value);
+      return entries;
+    }
+
+    function buildOfficialQuestion(entry, entries) {
+      const otherEntries = shuffle(entries.filter(item => item.id !== entry.id));
+      const askLawName = randomIndex(2) === 0;
+      if (askLawName) {
+        const distractors = [];
+        for (const item of otherEntries) {
+          if (item.lawName !== entry.lawName && !distractors.includes(item.lawName)) distractors.push(item.lawName);
+          if (distractors.length === 3) break;
+        }
+        if (distractors.length === 3) return {
+          q: `下列條文出自哪一部法規？「${shortenLawText(entry.text, 210)}」`,
+          options: [entry.lawName, ...distractors], answer: 0,
+          fact: `正確法源為「${entry.lawName} ${entry.articleNo}」。原文：${shortenLawText(entry.text, 420)}`,
+          source: [`${entry.lawName} ${entry.articleNo}`, entry.url], official: true,
+          meta: `${entry.level}｜${entry.category}`
+        };
+      }
+      const distractors = [];
+      const seenTexts = new Set([entry.text]);
+      for (const item of otherEntries) {
+        if (!seenTexts.has(item.text)) { distractors.push(shortenLawText(item.text)); seenTexts.add(item.text); }
+        if (distractors.length === 3) break;
+      }
+      return {
+        q: `「${entry.lawName} ${entry.articleNo}」的條文內容是哪一項？`,
+        options: [shortenLawText(entry.text), ...distractors], answer: 0,
+        fact: `正確條文：${shortenLawText(entry.text, 420)}`,
+        source: [`${entry.lawName} ${entry.articleNo}`, entry.url], official: true,
+        meta: `${entry.level}｜${entry.category}`
+      };
+    }
+
+    async function getOfficialQuestion() {
+      const manifest = await loadLawManifest();
+      if ([...dailyState.usedByShard.values()].reduce((sum, used) => sum + used.size, 0) >= manifest.totals.currentArticles) dailyState.usedByShard.clear();
+      for (let attempt = 0; attempt < manifest.shards.length * 2; attempt += 1) {
+        const shard = chooseWeightedShard(manifest.shards);
+        if (!shard) { dailyState.usedByShard.clear(); continue; }
+        const entries = await loadLawShard(shard.file);
+        const used = dailyState.usedByShard.get(shard.file) || new Set();
+        const available = entries.filter(entry => !used.has(entry.id));
+        if (!available.length) { dailyState.usedByShard.set(shard.file, new Set(entries.map(entry => entry.id))); continue; }
+        const entry = available[randomIndex(available.length)];
+        used.add(entry.id);
+        dailyState.usedByShard.set(shard.file, used);
+        const question = buildOfficialQuestion(entry, entries);
+        if (question.options.length >= 4) return question;
+      }
+      throw new Error("暫時無法產生題目，請再試一次");
+    }
+
+    function displayDailyQuestion(q) {
+      const options = shuffle(q.options.map((text, index) => ({ text, correct: index === q.answer })));
+      dailyState.answer = options.findIndex(option => option.correct);
+      dailyState.currentQuestion = q;
+      const meta = q.meta ? `<div class="law-question-meta">${escapeHtml(q.meta)}</div>` : "";
+      $("dailyCard").innerHTML = `<div class="daily-top"><span>QUESTION ${String(dailyState.index + 1).padStart(2, "0")}</span><span>${q.official ? "法務部公開法規隨機題" : "生活法律有趣問答"}</span></div><h2 class="serif">${escapeHtml(q.q)}</h2>${meta}<div class="quiz-options">${options.map((option, index) => `<button class="option-btn" type="button" data-daily-answer="${index}">${escapeHtml(option.text)}</button>`).join("")}</div><div id="dailyExplain"></div><div class="quiz-footer"><span class="score">選擇一個答案</span><button class="primary-btn hidden" type="button" id="nextDaily">下一題</button></div>`;
+      dailyState.answered = false;
+    }
+
+    async function renderDaily() {
+      const token = ++dailyState.renderToken;
+      renderDailyTopics();
+      if (dailyState.bank === "official") {
+        $("dailyCard").innerHTML = `<div class="daily-top"><span>PUBLIC LAW DATA</span><span>載入中</span></div><h2 class="serif">正在從完整公開法規題庫隨機抽題…</h2>`;
+        try {
+          const manifest = await loadLawManifest();
+          $("lawBankStatus").textContent = `${manifest.totals.currentLaws.toLocaleString()} 部現行法規・${manifest.totals.currentArticles.toLocaleString()} 條現行條文`;
+          const question = await getOfficialQuestion();
+          if (token === dailyState.renderToken && dailyState.bank === "official") displayDailyQuestion(question);
+        } catch (error) {
+          if (token === dailyState.renderToken) $("dailyCard").innerHTML = `<div class="legal-note"><strong>題庫暫時無法載入</strong><br>${escapeHtml(error.message)}。可切換到生活情境題繼續練習。</div>`;
+        }
+        return;
+      }
+      $("lawBankStatus").textContent = `${DAILY.length} 題生活情境題・每輪不重複`;
       const pool = dailyState.topic === "all" ? DAILY : DAILY.filter(item => item.topic === dailyState.topic);
       if (dailyState.queueTopic !== dailyState.topic || !dailyState.queue.length) {
         dailyState.queue = shuffle(pool);
         dailyState.queueTopic = dailyState.topic;
       }
-      const q = dailyState.queue[0];
-      const options = shuffle(q.options.map((text, index) => ({ text, correct: index === q.answer })));
-      dailyState.answer = options.findIndex(option => option.correct);
-      dailyState.currentQuestion = q;
-      $("dailyCard").innerHTML = `<div class="daily-top"><span>DAILY QUESTION ${String(dailyState.index + 1).padStart(2, "0")}</span><span>法律有趣問答</span></div><h2 class="serif">${q.q}</h2><div class="quiz-options">${options.map((option, index) => `<button class="option-btn" type="button" data-daily-answer="${index}">${option.text}</button>`).join("")}</div><div id="dailyExplain"></div><div class="quiz-footer"><span class="score">選擇一個答案</span><button class="primary-btn hidden" type="button" id="nextDaily">下一題</button></div>`;
-      dailyState.answered = false;
-      renderDailyTopics();
+      displayDailyQuestion(dailyState.queue[0]);
     }
     function answerDaily(index) {
       if (dailyState.answered) return; dailyState.answered = true;
@@ -1235,9 +1492,10 @@
       if (correct) { dailyState.streak += 1; dailyState.solved.add(dailyState.index); } else dailyState.streak = 0;
       $("dailyStreak").textContent = dailyState.streak;
       document.querySelectorAll("[data-daily-answer]").forEach((button, buttonIndex) => { button.disabled = true; if (buttonIndex === dailyState.answer) button.classList.add("correct"); if (buttonIndex === index && !correct) button.classList.add("wrong"); });
-      $("dailyExplain").innerHTML = `<div class="legal-note"><strong>${correct ? "答對了！" : "再挑戰一次"}</strong><br>${q.fact}</div>`; $("nextDaily").classList.remove("hidden");
+      const sourceLink = q.source ? `<a class="source-link" href="${escapeHtml(q.source[1])}" target="_blank" rel="noopener noreferrer">公開法源：${escapeHtml(q.source[0])} ↗</a>` : "";
+      $("dailyExplain").innerHTML = `<div class="legal-note"><strong>${correct ? "答對了！" : "這題答錯了"}</strong><br>${escapeHtml(q.fact)}<br>${sourceLink}</div>`; $("nextDaily").classList.remove("hidden");
     }
-    function nextDaily() { dailyState.queue.shift(); dailyState.index += 1; renderDaily(); }
+    function nextDaily() { if (dailyState.bank === "curated") dailyState.queue.shift(); dailyState.index += 1; renderDaily(); }
 
     document.addEventListener("click", event => {
       const target = event.target.closest("button, [role='button']");
@@ -1256,6 +1514,7 @@
       if (target.dataset.topic) selectTopic(target.dataset.topic);
       if (target.dataset.quizAnswer !== undefined) answerQuiz(Number(target.dataset.quizAnswer));
       if (target.dataset.dailyAnswer !== undefined) answerDaily(Number(target.dataset.dailyAnswer));
+      if (target.dataset.dailyBank) { dailyState.bank = target.dataset.dailyBank; dailyState.index = 0; dailyState.queue = []; dailyState.queueTopic = null; renderDaily(); }
       if (target.dataset.dailyTopic) { dailyState.topic = target.dataset.dailyTopic; dailyState.index = 0; dailyState.queue = []; dailyState.queueTopic = null; renderDaily(); }
       if (target.id === "backToCases" || target.id === "verdictCases") showScreen("caseScreen");
       if (target.id === "questionWitness") { renderQuestions(); openModal("questionModal"); }
@@ -1268,7 +1527,6 @@
       if (target.id === "applyBook") selectBook($("bookSelector").value);
       if (target.id === "generateNotes") generateNotesPreview();
       if (target.id === "sendNotesMessage") sendNotesMessage();
-      if (target.id === "clearNotesHistory") clearNoteMessages();
       if (target.id === "clearNotesRequest") { $("notesRequest").value = ""; $("notesResponse").classList.add("hidden"); }
     });
 

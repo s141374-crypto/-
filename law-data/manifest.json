@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-01T12:11:21.714Z",
+  "provider": "法務部全國法規資料庫 Open API",
+  "providerUrl": "https://law.moj.gov.tw/api/swagger/index.html",
+  "sources": [
+    {
+      "key": "law",
+      "label": "中央法律",
+      "url": "https://law.moj.gov.tw/api/ch/law/json",
+      "updateDate": "2026/8/21 上午 12:00:00",
+      "laws": 1346,
+      "articles": 47257,
+      "currentLaws": 1024,
+      "currentArticles": 40834
+    },
+    {
+      "key": "order",
+      "label": "中央命令",
+      "url": "https://law.moj.gov.tw/api/ch/order/json",
+      "updateDate": "2026/8/21 上午 12:00:00",
+      "laws": 10445,
+      "articles": 174612,
+      "currentLaws": 7245,
+      "currentArticles": 121332
+    }
+  ],
+  "shards": [
+    {
+      "file": "shard-001.json",
+      "source": "law",
+      "laws": 154,
+      "articles": 8375,
+      "currentArticles": 7467,
+      "bytes": 2497388
+    },
+    {
+      "file": "shard-002.json",
+      "source": "law",
+      "laws": 171,
+      "articles": 6803,
+      "currentArticles": 5251,
+      "bytes": 2498774
+    },
+    {
+      "file": "shard-003.json",
+      "source": "law",
+      "laws": 189,
+      "articles": 6200,
+      "currentArticles": 5097,
+      "bytes": 2454657
+    },
+    {
+      "file": "shard-004.json",
+      "source": "law",
+      "laws": 167,
+      "articles": 6436,
+      "currentArticles": 5604,
+      "bytes": 2499862
+    },
+    {
+      "file": "shard-005.json",
+      "source": "law",
+      "laws": 151,
+      "articles": 6244,
+      "currentArticles": 5506,
+      "bytes": 2497618
+    },
+    {
+      "file": "shard-006.json",
+      "source": "law",
+      "laws": 202,
+      "articles": 6118,
+      "currentArticles": 5013,
+      "bytes": 2497559
+    },
+    {
+      "file": "shard-007.json",
+      "source": "law",
+      "laws": 208,
+      "articles": 5152,
+      "currentArticles": 4987,
+      "bytes": 2499631
+    },
+    {
+      "file": "shard-008.json",
+      "source": "law",
+      "laws": 104,
+      "articles": 1929,
+      "currentArticles": 1909,
+      "bytes": 901090
+    },
+    {
+      "file": "shard-009.json",
+      "source": "order",
+      "laws": 426,
+      "articles": 7641,
+      "currentArticles": 4587,
+      "bytes": 2492678
+    },
+    {
+      "file": "shard-010.json",
+      "source": "order",
+      "laws": 295,
+      "articles": 6624,
+      "currentArticles": 4028,
+      "bytes": 2496916
+    },
+    {
+      "file": "shard-011.json",
+      "source": "order",
+      "laws": 240,
+      "articles": 5524,
+      "currentArticles": 3696,
+      "bytes": 2271589
+    },
+    {
+      "file": "shard-012.json",
+      "source": "order",
+      "laws": 292,
+      "articles": 6540,
+      "currentArticles": 2106,
+      "bytes": 2498479
+    },
+    {
+      "file": "shard-013.json",
+      "source": "order",
+      "laws": 231,
+      "articles": 5005,
+      "currentArticles": 2841,
+      "bytes": 2493818
+    },
+    {
+      "file": "shard-014.json",
+      "source": "order",
+      "laws": 221,
+      "articles": 4426,
+      "currentArticles": 2804,
+      "bytes": 2436102
+    },
+    {
+      "file": "shard-015.json",
+      "source": "order",
+      "laws": 277,
+      "articles": 5072,
+      "currentArticles": 2494,
+      "bytes": 2493799
+    },
+    {
+      "file": "shard-016.json",
+      "source": "order",
+      "laws": 396,
+      "articles": 6581,
+      "currentArticles": 2948,
+      "bytes": 2477758
+    },
+    {
+      "file": "shard-017.json",
+      "source": "order",
+      "laws": 136,
+      "articles": 4798,
+      "currentArticles": 2206,
+      "bytes": 2495944
+    },
+    {
+      "file": "shard-018.json",
+      "source": "order",
+      "laws": 323,
+      "articles": 5932,
+      "currentArticles": 3007,
+      "bytes": 2488978
+    },
+    {
+      "file": "shard-019.json",
+      "source": "order",
+      "laws": 193,
+      "articles": 5509,
+      "currentArticles": 2580,
+      "bytes": 2485350
+    },
+    {
+      "file": "shard-020.json",
+      "source": "order",
+      "laws": 103,
+      "articles": 4484,
+      "currentArticles": 3465,
+      "bytes": 2261698
+    },
+    {
+      "file": "shard-021.json",
+      "source": "order",
+      "laws": 328,
+      "articles": 5602,
+      "currentArticles": 3453,
+      "bytes": 2489256
+    },
+    {
+      "file": "shard-022.json",
+      "source": "order",
+      "laws": 195,
+      "articles": 5855,
+      "currentArticles": 4703,
+      "bytes": 2488937
+    },
+    {
+      "file": "shard-023.json",
+      "source": "order",
+      "laws": 310,
+      "articles": 5453,
+      "currentArticles": 2867,
+      "bytes": 2499738
+    },
+    {
+      "file": "shard-024.json",
+      "source": "order",
+      "laws": 401,
+      "articles": 5934,
+      "currentArticles": 2806,
+      "bytes": 2488478
+    },
+    {
+      "file": "shard-025.json",
+      "source": "order",
+      "laws": 288,
+      "articles": 5160,
+      "currentArticles": 3341,
+      "bytes": 2494063
+    },
+    {
+      "file": "shard-026.json",
+      "source": "order",
+      "laws": 296,
+      "articles": 5116,
+      "currentArticles": 3890,
+      "bytes": 2485675
+    },
+    {
+      "file": "shard-027.json",
+      "source": "order",
+      "laws": 297,
+      "articles": 5165,
+      "currentArticles": 4294,
+      "bytes": 2475915
+    },
+    {
+      "file": "shard-028.json",
+      "source": "order",
+      "laws": 345,
+      "articles": 5311,
+      "currentArticles": 4310,
+      "bytes": 2498564
+    },
+    {
+      "file": "shard-029.json",
+      "source": "order",
+      "laws": 403,
+      "articles": 5966,
+      "currentArticles": 4128,
+      "bytes": 2499432
+    },
+    {
+      "file": "shard-030.json",
+      "source": "order",
+      "laws": 449,
+      "articles": 6136,
+      "currentArticles": 4688,
+      "bytes": 2497289
+    },
+    {
+      "file": "shard-031.json",
+      "source": "order",
+      "laws": 402,
+      "articles": 5717,
+      "currentArticles": 4077,
+      "bytes": 2493754
+    },
+    {
+      "file": "shard-032.json",
+      "source": "order",
+      "laws": 450,
+      "articles": 5672,
+      "currentArticles": 5248,
+      "bytes": 2481980
+    },
+    {
+      "file": "shard-033.json",
+      "source": "order",
+      "laws": 558,
+      "articles": 6040,
+      "currentArticles": 5474,
+      "bytes": 2496906
+    },
+    {
+      "file": "shard-034.json",
+      "source": "order",
+      "laws": 410,
+      "articles": 5574,
+      "currentArticles": 5028,
+      "bytes": 2494866
+    },
+    {
+      "file": "shard-035.json",
+      "source": "order",
+      "laws": 414,
+      "articles": 5259,
+      "currentArticles": 4606,
+      "bytes": 2447784
+    },
+    {
+      "file": "shard-036.json",
+      "source": "order",
+      "laws": 396,
+      "articles": 5612,
+      "currentArticles": 5319,
+      "bytes": 2499716
+    },
+    {
+      "file": "shard-037.json",
+      "source": "order",
+      "laws": 315,
+      "articles": 5178,
+      "currentArticles": 4917,
+      "bytes": 2487249
+    },
+    {
+      "file": "shard-038.json",
+      "source": "order",
+      "laws": 465,
+      "articles": 5751,
+      "currentArticles": 5503,
+      "bytes": 2496645
+    },
+    {
+      "file": "shard-039.json",
+      "source": "order",
+      "laws": 587,
+      "articles": 5944,
+      "currentArticles": 5887,
+      "bytes": 2493834
+    },
+    {
+      "file": "shard-040.json",
+      "source": "order",
+      "laws": 3,
+      "articles": 31,
+      "currentArticles": 31,
+      "bytes": 15311
+    }
+  ],
+  "totals": {
+    "laws": 11791,
+    "articles": 221869,
+    "currentLaws": 8269,
+    "currentArticles": 162166
+  }
+}

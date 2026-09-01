@@ -1,0 +1,19 @@
+{
+  "name": "civic-law-lab-212",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:assets": "node scripts/copy-assets.mjs",
+    "sync:laws": "node scripts/sync-law-data.mjs",
+    "check": "npm run build:assets && wrangler types && tsc --noEmit && wrangler deploy --dry-run",
+    "dev": "npm run build:assets && wrangler dev",
+    "deploy": "npm run build:assets && wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "fflate": "latest",
+    "typescript": "latest",
+    "wrangler": "latest"
+  }
+}

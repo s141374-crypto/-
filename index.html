@@ -1390,7 +1390,7 @@
 
     async function loadLawManifest() {
       if (dailyState.manifest) return dailyState.manifest;
-      const response = await fetch("/law-data/manifest.json", { headers: { Accept: "application/json" } });
+      const response = await fetch(new URL("law-data/manifest.json", document.baseURI), { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error("完整法規索引載入失敗");
       dailyState.manifest = await response.json();
       return dailyState.manifest;
@@ -1418,7 +1418,7 @@
         dailyState.shardCache.set(file, cached);
         return cached;
       }
-      const response = await fetch(`/law-data/${encodeURIComponent(file)}`, { headers: { Accept: "application/json" } });
+      const response = await fetch(new URL(`law-data/${encodeURIComponent(file)}`, document.baseURI), { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error(`法規資料 ${file} 載入失敗`);
       const laws = await response.json();
       const entries = [];

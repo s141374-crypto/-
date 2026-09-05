@@ -735,14 +735,83 @@
       }
     ];
 
-    // Expand the court library to six graded cases while reusing the existing
-    // investigation mechanics and visual language.
-    CASES.push(...CASES.map((item, index) => ({
-      ...item,
-      type: `進階案件 ${index + 4}`,
-      title: [`網路交易與消費爭議`, `校園霸凌與權利救濟`, `個資外洩與責任判斷`][index],
-      difficulty: ["中級", "進階", "挑戰"][index]
-    })));
+    CASES.push(
+      {
+        type: "消費事件・履約證據",
+        title: "網路交易與消費爭議",
+        issue: "買家收到的包裹內沒有訂購的耳機，賣家卻主張商品已完整出貨，雙方對責任各執一詞。",
+        location: "消費爭議調解室・第 3 模擬庭",
+        witness: { name: "王姓賣家", role: "網路商店負責人", mark: "商" },
+        difficulty: "中級",
+        logicQuestion: "要判斷賣家是否完成交付，最應先核對什麼？",
+        logicOptions: [
+          { text: "出貨、運送與開箱資料能否形成完整證據鏈", correct: true, feedback: "正確。應比對商品交付各階段的客觀紀錄，而不是只採信其中一方說法。" },
+          { text: "賣場評價較高，所以賣家一定正確", correct: false, feedback: "評價只能提供背景，不能證明這一筆交易的包裹內容。" },
+          { text: "買家先抱怨，所以買家一定有錯", correct: false, feedback: "陳述先後與責任無必然關係，仍須回到交易證據。" }
+        ],
+        evidence: [
+          { id: "shop-weight", name: "物流重量紀錄", desc: "包裹入站重量明顯低於同款耳機加包材的正常重量。" },
+          { id: "shop-video", name: "連續開箱影片", desc: "影片從未拆封的物流袋開始拍攝，盒內只有緩衝紙。" },
+          { id: "shop-chat", name: "客服對話紀錄", desc: "客服曾回覆倉庫盤點多出一副同型號耳機，之後又撤回訊息。" }
+        ],
+        statements: [
+          { text: "倉庫有出貨照片，所以耳機一定放進包裹了。", correctEvidence: "shop-weight", objection: "物流重量與正常商品重量不符，單張出貨照片不足以證明商品實際裝入該包裹。", press: "照片中能辨識包裹編號與封箱後重量嗎？", response: "不能，照片只拍到耳機盒，沒有拍到完整包裹標籤。" },
+          { text: "買家可能在拍攝前先把商品拿走，開箱影片不能採信。", correctEvidence: "shop-video", objection: "影片連續拍攝未拆封物流袋、標籤與開箱過程，能反駁任意移除商品的推測。", press: "你能指出影片有中斷或包裝曾被拆封嗎？", response: "目前看不出中斷，也沒有明顯重封痕跡。" },
+          { text: "倉庫盤點完全正常，不可能多出商品。", correctEvidence: "shop-chat", objection: "客服當時的盤點訊息顯示同型號商品有溢出，與證詞的絕對說法矛盾。", press: "為什麼客服曾表示盤點多出同型號耳機？", response: "我需要再向倉庫確認當天的盤點資料。" }
+        ],
+        verdict: { title: "交付疑點成立，完成消費爭議整理", desc: "你以重量、完整開箱過程與客服紀錄建立相互支持的證據鏈，指出賣家尚未充分證明正確交付。", knowledge: "消費爭議應保存訂單、付款、物流、開箱與客服紀錄。是否得請求補寄、退款或賠償，仍須依契約內容與具體事實判斷。" }
+      },
+      {
+        type: "校園事件・持續性行為判讀",
+        title: "校園霸凌與權利救濟",
+        issue: "學生長期在班級群組遭嘲諷、排擠與散布照片，對方則稱只是同學間開玩笑。",
+        location: "校園事件模擬調查室・第 1 庭",
+        witness: { name: "李姓班級幹部", role: "同班學生", mark: "校" },
+        difficulty: "進階",
+        logicQuestion: "判斷是否為校園霸凌事件，應優先掌握哪一組事實？",
+        logicOptions: [
+          { text: "行為是否持續、造成傷害，以及雙方權力關係", correct: true, feedback: "正確。應綜合行為樣態、頻率、影響與關係情境調查。" },
+          { text: "只要行為人說是玩笑，就不必調查", correct: false, feedback: "行為人的說法不是唯一標準，仍須查明客觀行為與實際影響。" },
+          { text: "只看某一張截圖就立即定案", correct: false, feedback: "單一片段可能缺少上下文，應保存並核對完整資料。" }
+        ],
+        evidence: [
+          { id: "bully-chat", name: "完整群組紀錄", desc: "連續六週出現針對同一人的貶抑稱呼、改圖與排擠訊息。" },
+          { id: "bully-counsel", name: "輔導晤談紀錄", desc: "學生多次反映害怕上學、失眠，並請求停止散布照片。" },
+          { id: "bully-report", name: "導師事件紀錄", desc: "導師曾兩度制止相同行為，但數日後群組訊息再次出現。" }
+        ],
+        statements: [
+          { text: "群組裡只出現過一次玩笑，沒有持續針對任何人。", correctEvidence: "bully-chat", objection: "完整紀錄顯示行為跨越六週且集中針對同一學生，並非單一偶發訊息。", press: "你是否看過未經刪減的六週群組紀錄？", response: "沒有，我原本只看了其中一天的訊息。" },
+          { text: "被留言的同學看起來沒有在意，所以沒有受到影響。", correctEvidence: "bully-counsel", objection: "多次輔導紀錄呈現害怕上學與失眠，外表反應不能取代當事人的實際處境。", press: "你有詢問當事人或看過輔導紀錄嗎？", response: "沒有，我只是從他在教室的表現猜測。" },
+          { text: "老師提醒後事情就結束了，之後沒有再發生。", correctEvidence: "bully-report", objection: "事件紀錄顯示制止後仍再次發生，證詞忽略了後續情況。", press: "你能確認第二次制止後的群組內容嗎？", response: "我沒有繼續往後查看。" }
+        ],
+        verdict: { title: "持續性證據完整，完成校園事件調查", desc: "你用長期群組紀錄、影響資料與校方處理時間線，避免案件被一句『只是玩笑』草率帶過。", knowledge: "校園事件應由學校依程序受理與調查，並注意保密、當事人陳述及必要保護措施；實際是否成立仍以正式調查結果為準。" }
+      },
+      {
+        type: "個資事件・目的範圍判斷",
+        title: "個資外洩與責任判斷",
+        issue: "社團將報名者姓名、電話與電子郵件公開在網站上，主辦人聲稱資料原本就是為了活動而蒐集。",
+        location: "資訊與隱私模擬法庭・第 2 庭",
+        witness: { name: "周姓活動主辦人", role: "社團資料管理人", mark: "資" },
+        difficulty: "挑戰",
+        logicQuestion: "判斷公開名單是否超出個資利用範圍，首先要比對什麼？",
+        logicOptions: [
+          { text: "原蒐集告知、同意範圍與實際公開方式", correct: true, feedback: "正確。取得資料不代表可以任意公開，須核對特定目的與必要範圍。" },
+          { text: "活動免費，所以不受個資規範", correct: false, feedback: "是否收費不是判斷個資保護義務的唯一標準。" },
+          { text: "只要網站之後刪除，就代表從未外洩", correct: false, feedback: "事後移除可降低持續風險，但不能抹去先前已公開的事實。" }
+        ],
+        evidence: [
+          { id: "privacy-form", name: "報名告知頁面", desc: "告知內容僅寫明用於活動通知與保險聯繫，未提到公開聯絡資料。" },
+          { id: "privacy-page", name: "公開網頁存證", desc: "無須登入即可查看完整姓名、電話及電子郵件，頁面持續公開三天。" },
+          { id: "privacy-log", name: "網站存取紀錄", desc: "公開期間該名單頁面有大量非活動成員來源的瀏覽紀錄。" }
+        ],
+        statements: [
+          { text: "報名者同意提供資料，就等於同意我們公開全部內容。", correctEvidence: "privacy-form", objection: "告知頁面限定用途為活動通知與保險聯繫，沒有記載公開聯絡資料。", press: "告知文字中哪一段明確說明會公開電話與電子郵件？", response: "沒有明確寫出公開，只寫了活動聯繫用途。" },
+          { text: "只有社團成員看得到名單，不算對外公開。", correctEvidence: "privacy-page", objection: "網頁存證顯示無須登入即可查看，實際存取範圍並未限於社團成員。", press: "網站是否設有登入或成員權限驗證？", response: "當時沒有，知道網址的人都能開啟。" },
+          { text: "頁面沒什麼人看，所以不會產生風險。", correctEvidence: "privacy-log", objection: "存取紀錄顯示已有大量非成員瀏覽，證詞與客觀流量資料不符。", press: "你是否檢查過公開期間的網站存取紀錄？", response: "沒有，我原本只憑感覺認為沒人會看。" }
+        ],
+        verdict: { title: "利用範圍超出疑慮成立，完成個資事件判讀", desc: "你比對蒐集目的、公開狀態與實際存取紀錄，指出取得資料與公開資料是不同層次的法律問題。", knowledge: "蒐集、處理及利用個人資料應有特定目的與法定基礎，並採取適當安全措施。發生事件時應儘速停止公開、保存紀錄、評估影響並依規定處理。" }
+      }
+    );
 
     const CHAPTERS = [
       "高一第一冊｜自我、人與公共生活", "高一第二冊｜社會與文化", "高二第一冊｜民主政治與政府", "高二第二冊｜法律與人權", "高三第一冊｜經濟與生活", "高三第二冊｜全球化與公共議題",

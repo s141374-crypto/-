@@ -6,6 +6,10 @@ await copyFile(
   new URL("../public/index.html", import.meta.url)
 );
 await copyFile(
+  new URL("../civics-data.js", import.meta.url),
+  new URL("../public/civics-data.js", import.meta.url)
+);
+await copyFile(
   new URL("../_headers", import.meta.url),
   new URL("../public/_headers", import.meta.url)
 );

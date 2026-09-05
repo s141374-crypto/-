@@ -452,6 +452,7 @@
     .tab-btn { border-radius: 0; }
     .tab-btn.active { border-bottom: 2px solid var(--deep-teal); background: transparent; color: var(--ink-blue); box-shadow: none; }
     .topic-rail { background: var(--sage); }
+    .topic-rail { position: sticky; top: 92px; max-height: calc(100vh - 112px); overflow: auto; }
     .topic-chip { border: 1px solid var(--deep-teal); border-radius: 4px; background: rgba(255,255,255,.48); }
     .topic-chip.active { border-color: var(--forest); background: var(--forest); }
     .progress-line { height: 4px; border-radius: 0; }
@@ -476,6 +477,7 @@
       .mode-card { min-height: 235px; }
       .court-grid, .learning-grid, .daily-layout { grid-template-columns: 1fr; }
       .topic-list { grid-template-columns: repeat(2, 1fr); }
+      .topic-rail { position: static; max-height: none; }
       .daily-aside { order: -1; }
     }
     @media (max-width: 620px) {
@@ -615,7 +617,7 @@
       <button class="back-link" type="button" data-home>← 回到三種模式</button>
       <div class="screen-head">
         <div><div class="kicker">02 / 公民小學堂</div><h1 class="serif">把大觀念，讀成小卡片</h1></div>
-        <p>練習題會立即解析；筆記區則整理高中公民常見的法律、政治與經濟觀念。</p>
+        <p>依國教院 108 課綱四大主題練習原創情境題；每題附課綱代碼，筆記涵蓋完整高中公民必修範圍。</p>
       </div>
       <div class="tabs" role="tablist">
         <button class="tab-btn active" type="button" data-civic-tab="quiz">考題練習</button>
@@ -625,12 +627,12 @@
         <section class="panel selector-panel">
           <h2 class="serif">選擇練習方式</h2>
           <div class="selector-row">
-            <label class="selector-field">依年級與冊別
-              <select id="bookSelector"><option value="all">全部高中公民</option></select>
+            <label class="selector-field">依 108 課綱主題
+              <select id="bookSelector"><option value="all">全部高中公民必修</option></select>
             </label>
             <button class="soft-btn" type="button" id="applyBook">開始此冊練習</button>
           </div>
-          <p class="notes-helper">可依序選擇高一、高二或高三，以及該年級的第幾冊；也可以使用下方主題章節選擇。</p>
+          <p class="notes-helper">資料範圍依國家教育研究院社會領域課綱 A、B、C、D 四大主題整理，不依特定出版社冊別。</p>
         </section>
         <div class="learning-grid">
           <aside class="panel topic-rail"><h2 class="serif">選擇單元</h2><div class="topic-list" id="topicList"></div></aside>
@@ -643,10 +645,10 @@
           <p class="notes-helper">先選擇課綱來源與章節，再生成畫面預覽。確認內容後，可在下方小隊對話框提出微調；本功能不會直接生成或下載純文字檔。</p>
           <div class="selector-row">
             <label class="selector-field">參考課綱
-              <select id="noteSource"><option value="junior3">國中公民第三冊</option><option value="senior2">高中公民第二冊</option><option value="senior3">高中公民第三冊</option></select>
+              <select id="noteSource"><option value="naer-108">國教院 108 課綱｜高中公民與社會</option></select>
             </label>
             <label class="selector-field">章節主題
-              <select id="noteChapter"><option value="local-government">第二章第二節：地方政府的組成</option><option value="separation">權力分立與制衡</option><option value="rights">基本權利與權利救濟</option></select>
+              <select id="noteChapter"></select>
             </label>
             <button class="primary-btn" type="button" id="generateNotes">生成預覽</button>
           </div>
@@ -696,6 +698,7 @@
   </div>
   <div class="toast" id="toast" aria-live="polite"></div>
 
+  <script src="./civics-data.js"></script>
   <script>
     const CASES = [
       {
@@ -850,12 +853,12 @@
       }
     );
 
-    const CHAPTERS = [
+    const LEGACY_CHAPTERS = [
       "高一第一冊｜自我、人與公共生活", "高一第二冊｜社會與文化", "高二第一冊｜民主政治與政府", "高二第二冊｜法律與人權", "高三第一冊｜經濟與生活", "高三第二冊｜全球化與公共議題",
       "憲法與基本人權", "法律生活與權利救濟", "民主政治與政府", "選舉與政治參與", "社會規範與文化", "媒體、科技與公共討論", "經濟學基本概念", "市場、政府與分配", "勞動與消費者權益", "全球化與國際關係"
     ];
 
-    const CHAPTER_CONCEPTS = [
+    const LEGACY_CHAPTER_CONCEPTS = [
       ["社會化", "自我認同", "公共利益", "權利與義務", "公民參與", "社會規範", "民主溝通", "多元文化", "公共生活", "責任政治"],
       ["文化的意義", "文化差異", "族群認同", "性別平等", "媒體識讀", "全球化", "社會流動", "家庭功能", "教育功能", "社會正義"],
       ["民主政治", "主權在民", "權力分立", "行政權", "立法權", "司法權", "責任政治", "政府透明", "國會監督", "依法行政"],
@@ -874,7 +877,7 @@
       ["國際貿易", "國際法", "外交", "國際安全", "全球公民", "氣候變遷", "永續發展", "跨國合作", "人道援助", "文化交流"]
     ];
 
-    const CIVICS = [
+    const LEGACY_CIVICS = [
       { topic: "憲法與人權", q: "政府限制人民基本權時，通常必須有法律依據，這最接近哪項原則？", options: ["法律保留原則", "多數決原則", "罪刑相當原則"], answer: 0, explain: "法律保留強調重要事項，尤其涉及人民權利時，應由法律或法律明確授權規範。" },
       { topic: "憲法與人權", q: "即使為了公共利益限制基本權，手段仍不應超過必要程度。這是哪項原則？", options: ["信賴保護", "比例原則", "權力分立"], answer: 1, explain: "比例原則會檢查手段是否合適、必要，且造成的損害與公益是否失衡。" },
       { topic: "民主政治", q: "立法院對行政院施政進行質詢，主要展現哪種民主機制？", options: ["權力制衡", "司法獨立", "地方自治"], answer: 0, explain: "不同國家機關透過制度互相監督與制衡，可降低權力過度集中。" },
@@ -884,26 +887,26 @@
     ];
 
     /* disabled legacy metadata block
-    CIVICS.forEach((item, index) => {
+    LEGACY_CIVICS.forEach((item, index) => {
       item.id = `civic-${index + 1}`;
-      item.chapter = CHAPTERS[index % CHAPTERS.length];
+      item.chapter = LEGACY_CHAPTERS[index % LEGACY_CHAPTERS.length];
       item.grade = index % 3 === 0 ? "高一" : index % 3 === 1 ? "高二" : "高三";
       item.book = `${item.grade}第${index % 2 + 1}冊`;
     });
 
     */
-    CIVICS.forEach((item, index) => {
+    LEGACY_CIVICS.forEach((item, index) => {
       item.id = `civic-${index + 1}`;
-      item.chapter = CHAPTERS[index % CHAPTERS.length];
+      item.chapter = LEGACY_CHAPTERS[index % LEGACY_CHAPTERS.length];
       item.grade = index % 3 === 0 ? "G1" : index % 3 === 1 ? "G2" : "G3";
       item.book = `${item.grade}-Book-${index % 2 + 1}`;
     });
 
-    CHAPTER_CONCEPTS.forEach((concepts, chapterIndex) => {
-      const chapter = CHAPTERS[chapterIndex];
+    LEGACY_CHAPTER_CONCEPTS.forEach((concepts, chapterIndex) => {
+      const chapter = LEGACY_CHAPTERS[chapterIndex];
       concepts.forEach((concept, conceptIndex) => {
         const definition = `理解「${concept}」時，應放回${chapter}的脈絡，掌握其制度目的、適用情境與可能限制。`;
-        CIVICS.push({
+        LEGACY_CIVICS.push({
           id: `chapter-${chapterIndex + 1}-${conceptIndex + 1}`,
           chapter, topic: chapter, grade: chapterIndex < 2 ? "G1" : chapterIndex < 4 ? "G2" : "G3",
           book: `${chapterIndex < 2 ? "G1" : chapterIndex < 4 ? "G2" : "G3"}-Book-${chapterIndex % 2 + 1}`,
@@ -915,14 +918,14 @@
       });
     });
 
-    const NOTES = [
+    const LEGACY_NOTES = [
       { title: "比例原則", text: "限制人民權利時，可依適合性、必要性與衡量性三步檢查。口訣：做得到、傷害少、值得做。" },
       { title: "權力分立與制衡", text: "分權不是彼此毫無往來，而是讓立法、行政、司法各有職權，也能透過制度互相監督。" },
       { title: "民事與刑事", text: "民事處理私人間的權利義務；刑事判斷是否犯罪並決定刑罰。同一行為可能同時涉及兩者。" },
       { title: "機會成本", text: "不是所有放棄選項的總和，而是被放棄的『最佳』替代選項價值。選擇本身就會產生成本。" }
     ];
 
-    const NOTE_BLUEPRINTS = {
+    const LEGACY_NOTE_BLUEPRINTS = {
       "local-government": {
         title: "地方政府的組成", source: "國中公民第三冊｜第二章第二節：地方政府的組成",
         intro: "地方自治是中央與地方分工治理的重要制度，讓地方居民能依地方需求參與公共事務。",
@@ -939,6 +942,29 @@
         sections: [{ h: "一、限制基本權利的原則", bullets: ["法律保留：重要權利限制應有法律依據。", "比例原則：手段適合、必要，且損害與公益相稱。", "正當法律程序：決定前應給予陳述與救濟機會。"] }, { h: "二、常見救濟方向", bullets: ["對行政處分不服，可依個案情形提起訴願或行政訴訟。", "私人間爭議通常透過民事程序請求損害賠償或返還。", "刑事案件由國家追訴犯罪，但被告仍享有程序保障。"] }], compare: ["請願", "向政府陳述意見、反映訴求，重點是公共政策建議。", "訴願", "人民不服行政處分時，依法請求行政機關重新審查。"]
       }
     };
+
+    const CURRICULUM = window.CIVICS_CURRICULUM_DATA;
+    if (!CURRICULUM?.units?.length) throw new Error("公民課綱資料載入失敗");
+    const CHAPTERS = CURRICULUM.units.map(unit => unit.title);
+    const CIVICS = CURRICULUM.units.flatMap(unit => unit.questions.map((question, index) => ({
+      ...question,
+      id: `${unit.id}-${index + 1}`,
+      chapter: unit.title,
+      topic: unit.title,
+      theme: unit.theme,
+      book: unit.theme,
+      code: unit.code,
+      sourceUrl: CURRICULUM.source.url
+    })));
+    const NOTES = CURRICULUM.units.map(unit => ({ title: unit.title, text: unit.intro }));
+    const NOTE_BLUEPRINTS = Object.fromEntries(CURRICULUM.units.map(unit => [unit.id, {
+      title: unit.title,
+      source: `${CURRICULUM.source.organization}｜${unit.code}`,
+      sourceUrl: CURRICULUM.source.url,
+      intro: unit.intro,
+      sections: [{ h: "課綱學習重點", bullets: unit.keyPoints }],
+      compare: unit.compare
+    }]));
 
     const DAILY = [
       { topic: "生活安全", q: "撿到別人的手機，只要沒有拿去賣，就可以先放在自己家嗎？", options: ["可以，撿到就暫時屬於自己", "不宜，應通知失主或送交警察等適當處理", "只要關機就沒關係"], answer: 1, fact: "拾得遺失物後，應從速通知有受領權的人，或報告警察、自治機關並交存拾得物。", source: ["民法第 803 條", "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=B0000001&flno=803"] },
@@ -1260,10 +1286,8 @@
 
     // Updated learning, note export, case grading, and quiz progression.
     const BOOKS = [
-      { value: "all", label: "\u5168\u90e8\u9ad8\u4e2d\u516c\u6c11" },
-      { value: "G1-Book-1", label: "\u9ad8\u4e00\u7b2c\u4e00\u518a" }, { value: "G1-Book-2", label: "\u9ad8\u4e00\u7b2c\u4e8c\u518a" },
-      { value: "G2-Book-1", label: "\u9ad8\u4e8c\u7b2c\u4e00\u518a" }, { value: "G2-Book-2", label: "\u9ad8\u4e8c\u7b2c\u4e8c\u518a" },
-      { value: "G3-Book-1", label: "\u9ad8\u4e09\u7b2c\u4e00\u518a" }, { value: "G3-Book-2", label: "\u9ad8\u4e09\u7b2c\u4e8c\u518a" }
+      { value: "all", label: "全部高中公民必修" },
+      ...CURRICULUM.themes.map(theme => ({ value: theme.id, label: theme.label }))
     ];
 
     function renderCases() {
@@ -1279,9 +1303,17 @@
       $("bookSelector").value = civicState.book;
     }
 
+    function setupNoteSelectors() {
+      $("noteSource").innerHTML = `<option value="naer-108">${escapeHtml(CURRICULUM.source.organization)}｜108 課綱高中公民與社會</option>`;
+      $("noteChapter").innerHTML = CURRICULUM.themes.map(theme => {
+        const options = CURRICULUM.units.filter(unit => unit.theme === theme.id).map(unit => `<option value="${unit.id}">${escapeHtml(unit.code)}｜${escapeHtml(unit.title)}</option>`).join("");
+        return `<optgroup label="${escapeHtml(theme.label)}">${options}</optgroup>`;
+      }).join("");
+    }
+
     function renderTopics() {
       const topics = ["all", ...CHAPTERS];
-      $("topicList").innerHTML = topics.map(topic => { const count = topic === "all" ? CIVICS.length : CIVICS.filter(item => item.chapter === topic).length; return `<button class="topic-chip ${civicState.topic === topic ? "active" : ""}" type="button" data-topic="${topic}">${topic === "all" ? "全部章節" : topic} <small>（${count} 題）</small></button>`; }).join("");
+      $("topicList").innerHTML = topics.map(topic => { const count = topic === "all" ? CIVICS.length : CIVICS.filter(item => item.chapter === topic).length; return `<button class="topic-chip ${civicState.topic === topic ? "active" : ""}" type="button" data-topic="${escapeHtml(topic)}">${topic === "all" ? "全部 32 單元" : escapeHtml(topic)} <small>（${count} 題）</small></button>`; }).join("");
     }
 
     function selectTopic(topic) {
@@ -1295,7 +1327,7 @@
 
     function selectBook(book) {
       civicState.book = book; civicState.topic = "all"; civicState.index = 0; civicState.score = 0; civicState.answered = false; civicState.asked = new Set(); civicState.currentAnswer = null;
-      civicState.questions = book === "all" ? [...CIVICS] : CIVICS.filter(item => item.book === book);
+      civicState.questions = book === "all" ? [...CIVICS] : CIVICS.filter(item => item.theme === book);
       renderTopics(); renderQuiz();
     }
 
@@ -1310,7 +1342,7 @@
       const shuffledOptions = shuffle(q.options.map((text, index) => ({ text, correct: index === q.answer })));
       civicState.currentAnswer = shuffledOptions.findIndex(option => option.correct);
       const questionNumber = civicState.asked.size;
-      $("quizCard").innerHTML = `<div class="question-no">QUESTION ${String(questionNumber).padStart(2, "0")} · ${q.chapter}</div><div class="progress-line"><div style="width:${(civicState.asked.size / civicState.questions.length) * 100}%"></div></div><h2 class="serif">${q.q}</h2><div class="quiz-options">${shuffledOptions.map((option, index) => `<button class="option-btn" type="button" data-quiz-answer="${index}">${option.text}</button>`).join("")}</div><div id="quizExplain"></div><div class="quiz-footer"><span class="score">本輪答對 ${civicState.score} 題</span><button class="primary-btn hidden" type="button" id="nextQuiz">下一題</button></div>`;
+      $("quizCard").innerHTML = `<div class="question-no">QUESTION ${String(questionNumber).padStart(2, "0")} · ${escapeHtml(q.code)} · ${escapeHtml(q.chapter)}</div><div class="progress-line"><div style="width:${(civicState.asked.size / civicState.questions.length) * 100}%"></div></div><h2 class="serif">${escapeHtml(q.q)}</h2><div class="quiz-options">${shuffledOptions.map((option, index) => `<button class="option-btn" type="button" data-quiz-answer="${index}">${escapeHtml(option.text)}</button>`).join("")}</div><div id="quizExplain"></div><div class="quiz-footer"><span class="score">本輪答對 ${civicState.score} 題</span><button class="primary-btn hidden" type="button" id="nextQuiz">下一題</button></div>`;
     }
 
     function answerQuiz(index) {
@@ -1321,17 +1353,18 @@
       civicState.lastCorrect = correct;
       if (correct) { civicState.score += 1; civicState.solved.add(q.id); }
       document.querySelectorAll("[data-quiz-answer]").forEach((button, buttonIndex) => { button.disabled = true; if (buttonIndex === civicState.currentAnswer) button.classList.add("correct"); if (buttonIndex === index && !correct) button.classList.add("wrong"); });
-      $("quizExplain").innerHTML = `<div class="feedback"><strong>${correct ? "答對了！" : "再想想看"}</strong><br>${q.explain}</div>`;
+      $("quizExplain").innerHTML = `<div class="feedback"><strong>${correct ? "答對了！" : "再想想看"}</strong><br>${escapeHtml(q.explain)}<br><a class="source-link" href="${q.sourceUrl}" target="_blank" rel="noopener noreferrer">課綱依據：${escapeHtml(q.code)}｜國家教育研究院</a></div>`;
       $("nextQuiz").classList.remove("hidden");
+      document.querySelector("#quizCard .score").textContent = `本輪答對 ${civicState.score} 題`;
     }
 
     function nextQuiz() { civicState.answered = false; renderQuiz(); }
     function renderNotes() { $("notesGrid").innerHTML = NOTES.map((note, index) => `<article class="panel note-card" data-no="0${index + 1}"><div class="note-key">NOTE 0${index + 1}</div><h2 class="serif">${note.title}</h2><p>${note.text}</p></article>`).join(""); }
     function renderNotePreview(message = "") {
-      const key = $("noteChapter").value; const source = $("noteSource").selectedOptions[0].textContent; const blueprint = NOTE_BLUEPRINTS[key] || NOTE_BLUEPRINTS["local-government"];
-      const sections = blueprint.sections.map(section => `<h2>${section.h}</h2><ul>${section.bullets.map(item => `<li>${item}</li>`).join("")}</ul>`).join("");
-      const compare = `<h2>容易混淆概念比較</h2><table class="compare-table"><thead><tr><th>概念</th><th>重點</th></tr></thead><tbody><tr><td>${blueprint.compare[0]}</td><td>${blueprint.compare[1]}</td></tr><tr><td>${blueprint.compare[2]}</td><td>${blueprint.compare[3]}</td></tr></tbody></table>`;
-      $("notePreview").innerHTML = `<span class="note-source">參考來源：${source}</span><h1>${blueprint.title}</h1><p>${blueprint.intro}</p>${sections}${compare}${message ? `<div class="legal-note"><strong>小隊修正紀錄</strong><br>${escapeHtml(message)}</div>` : ""}`;
+      const key = $("noteChapter").value; const blueprint = NOTE_BLUEPRINTS[key] || NOTE_BLUEPRINTS[CURRICULUM.units[0].id];
+      const sections = blueprint.sections.map(section => `<h2>${escapeHtml(section.h)}</h2><ul>${section.bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`).join("");
+      const compare = `<h2>容易混淆概念比較</h2><table class="compare-table"><thead><tr><th>概念</th><th>重點</th></tr></thead><tbody><tr><td>${escapeHtml(blueprint.compare[0])}</td><td>${escapeHtml(blueprint.compare[1])}</td></tr><tr><td>${escapeHtml(blueprint.compare[2])}</td><td>${escapeHtml(blueprint.compare[3])}</td></tr></tbody></table>`;
+      $("notePreview").innerHTML = `<a class="note-source" href="${blueprint.sourceUrl}" target="_blank" rel="noopener noreferrer">參考來源：${escapeHtml(blueprint.source)}</a><h1>${escapeHtml(blueprint.title)}</h1><p>${escapeHtml(blueprint.intro)}</p>${sections}${compare}${message ? `<div class="legal-note"><strong>小隊修正紀錄</strong><br>${escapeHtml(message)}</div>` : ""}`;
     }
     function generateNotesPreview() { renderNotePreview(); $("notesResponse").textContent = "已生成結構化預覽，請先檢查來源與章節考據，再使用下方對話框微調。"; $("notesResponse").classList.remove("hidden"); }
     const NOTE_DB_NAME = "civic-learning-notes";
@@ -1675,6 +1708,7 @@
     civicState.book = "all";
     civicState.questions = [...CIVICS];
     setupBooks();
+    setupNoteSelectors();
     renderTopics();
     renderQuiz();
     renderDaily();

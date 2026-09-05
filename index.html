@@ -438,6 +438,30 @@
     .option-btn:hover { border-color: var(--blue); background: var(--mist); }
     .option-btn.correct, .evidence-item.collected { border-color: var(--forest); background: rgba(190,196,187,.35); }
     .option-btn.wrong { border-color: var(--olive); background: rgba(157,142,126,.18); }
+    .quiz-options .option-btn:disabled { opacity: 1; cursor: default; }
+    .quiz-options .option-btn.correct {
+      border: 3px solid #15362f;
+      background: #24584d;
+      color: #fff;
+      font-weight: 900;
+      box-shadow: inset 6px 0 0 #fff;
+    }
+    .quiz-options .option-btn.wrong {
+      border: 3px solid #491b1b;
+      background: #873737;
+      color: #fff;
+      font-weight: 900;
+      box-shadow: inset 6px 0 0 #f0c45c;
+    }
+    .quiz-options .option-btn.correct::after,
+    .quiz-options .option-btn.wrong::after {
+      display: block;
+      margin-top: 7px;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .quiz-options .option-btn.correct::after { content: "✓ 正確答案"; }
+    .quiz-options .option-btn.wrong::after { content: "✕ 你的選擇"; color: #fff4c8; }
     .feedback, .legal-note, .knowledge-box { border-left: 4px solid var(--forest); background: var(--sage); color: var(--deep-teal); }
     .source-link { display: inline-block; margin-top: 8px; color: var(--ink-blue); font-size: 12px; text-underline-offset: 3px; }
     .law-bank-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
@@ -1352,7 +1376,17 @@
       const correct = index === civicState.currentAnswer;
       civicState.lastCorrect = correct;
       if (correct) { civicState.score += 1; civicState.solved.add(q.id); }
-      document.querySelectorAll("[data-quiz-answer]").forEach((button, buttonIndex) => { button.disabled = true; if (buttonIndex === civicState.currentAnswer) button.classList.add("correct"); if (buttonIndex === index && !correct) button.classList.add("wrong"); });
+      document.querySelectorAll("[data-quiz-answer]").forEach((button, buttonIndex) => {
+        button.disabled = true;
+        if (buttonIndex === civicState.currentAnswer) {
+          button.classList.add("correct");
+          button.setAttribute("aria-label", `正確答案：${button.textContent}`);
+        }
+        if (buttonIndex === index && !correct) {
+          button.classList.add("wrong");
+          button.setAttribute("aria-label", `你的選擇，答案錯誤：${button.textContent}`);
+        }
+      });
       $("quizExplain").innerHTML = `<div class="feedback"><strong>${correct ? "答對了！" : "再想想看"}</strong><br>${escapeHtml(q.explain)}<br><a class="source-link" href="${q.sourceUrl}" target="_blank" rel="noopener noreferrer">課綱依據：${escapeHtml(q.code)}｜國家教育研究院</a></div>`;
       $("nextQuiz").classList.remove("hidden");
       document.querySelector("#quizCard .score").textContent = `本輪答對 ${civicState.score} 題`;
@@ -1657,7 +1691,17 @@
       const q = dailyState.currentQuestion; const correct = index === dailyState.answer;
       if (correct) { dailyState.streak += 1; dailyState.solved.add(dailyState.index); } else dailyState.streak = 0;
       $("dailyStreak").textContent = dailyState.streak;
-      document.querySelectorAll("[data-daily-answer]").forEach((button, buttonIndex) => { button.disabled = true; if (buttonIndex === dailyState.answer) button.classList.add("correct"); if (buttonIndex === index && !correct) button.classList.add("wrong"); });
+      document.querySelectorAll("[data-daily-answer]").forEach((button, buttonIndex) => {
+        button.disabled = true;
+        if (buttonIndex === dailyState.answer) {
+          button.classList.add("correct");
+          button.setAttribute("aria-label", `正確答案：${button.textContent}`);
+        }
+        if (buttonIndex === index && !correct) {
+          button.classList.add("wrong");
+          button.setAttribute("aria-label", `你的選擇，答案錯誤：${button.textContent}`);
+        }
+      });
       const sourceLink = q.source ? `<a class="source-link" href="${escapeHtml(q.source[1])}" target="_blank" rel="noopener noreferrer">公開法源：${escapeHtml(q.source[0])} ↗</a>` : "";
       $("dailyExplain").innerHTML = `<div class="legal-note"><strong>${correct ? "答對了！" : "這題答錯了"}</strong><br>${escapeHtml(q.fact)}<br>${sourceLink}</div>`; $("nextDaily").classList.remove("hidden");
     }
